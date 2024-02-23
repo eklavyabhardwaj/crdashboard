@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversion Ratio Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5; /* Light Gray */
+            color: #333; /* Dark Gray */
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: grid;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: #fff; /* White */
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Light Gray Shadow */
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            background-color: #f2f2f2; /* Light Gray */
+        }
+
+        select {
+            margin-top: 10px;
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #fff; /* White */
+            color: #333; /* Dark Gray */
+        }
+
+        .charts {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(2, 1fr);
+            margin-top: 30px;
+        }
+
+        .charts2
+        {
+            display: block;
+            gap: 20px;
+            grid-template-columns: repeat(2, 1fr);
+            margin-top: 30px;
+        }
+
+
+        .graph-container {
+            padding: 20px;
+            background-color: #fff; /* White */
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Light Gray Shadow */
+        }
+
+        h2 {
+            color: #006666; /* Teal */
+            font-size: 18px;
+        }
+
+        .conversion-ratio {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: smaller;
+            color: #006666; /* Teal */
+        }
+
+        input[type="submit"] {
+            background-color: teal;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 15px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #007F7F;
+        }
+
+
+    </style>
+</head>
+<body>
+
+    <!-- Dropdown menu for selecting months -->
+    <div class="container">
+        <h1>Conversion Ratio Dashboard</h1>
+        <form action="/" method="get">
+            <label for="month">Select Month:</label>
+            <select name="month" id="month">
+                {% for month in layout.months %}
+                    <option value="{{ month }}">{{ month }}</option>
+                {% endfor %}
+            </select>
+            <input type="submit" value="Filter Month">
+        </form>
+
+        <!-- Display the data table -->
+        <div class="graph-container">
+            <table>
+                {{ layout.df|safe }}
+            </table>
+
+            <div class="conversion-ratio">
+                <p>* Conversion Ratio = Order Value / Opportunity Value</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Display the charts -->
+    <div class="charts">
+        <div class="graph-container">
+            <h2>Opportunity Amount Over Months</h2>
+            <div id="opportunity_chart"></div>
+            {{ layout.opportunity_chart|safe }}
+        </div>
+
+        <div class="graph-container">
+            <h2>Order Value Over Months</h2>
+            <div id="order_value_chart"></div>
+            {{ layout.order_value_chart|safe }}
+        </div>
+
+      </div>
+      <div class = "charts2"
+
+        <div class="graph-container">
+            <h2Conversion Rate Over Months</h2>
+            <div id=" conversion_rate_chart"></div>
+            {{ layout.conversion_rate_chart|safe }}
+        </div>
+
+
+    </div>
+
+    <script>
+        // Plotly plots need to be initialized separately using JavaScript
+        Plotly.newPlot('conversion_rate_chart', {{ layout.conversion_rate_chart }}, {});
+        Plotly.newPlot('order_value_chart', {{ layout.order_value_chart }}, {});
+        Plotly.newPlot('opportunity_chart', {{ layout.opportunity_chart }}, {});
+
+    </script>
+
+</body>
+</html>
