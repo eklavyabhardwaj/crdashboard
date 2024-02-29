@@ -7,7 +7,6 @@
     <title>Conversion Ratio Dashboard</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
-
         body {
             font-family: 'Arial', sans-serif;
             background-color: #f5f5f5; /* Light Gray */
@@ -75,11 +74,6 @@
             font-size: 18px;
         }
 
-        h {
-            color: white; /* Teal */
-
-        }
-
         .conversion-ratio {
             margin-top: 20px;
             font-weight: bold;
@@ -101,7 +95,7 @@
             background-color: #007F7F;
         }
 
-        .container {
+         .container {
         /* Your existing container styles */
         text-align: left; /* Center align the links */
     }
@@ -117,7 +111,12 @@
         transition: background-color 0.3s, color 0.3s; /* Smooth transition */
     }
 
-        .dashboard-link2 {
+    .dashboard-link:hover {
+        background-color: #006666; /* Solid teal color on hover */
+        color: white; /* White text on hover */
+    }
+
+                                .dashboard-link2 {
 
         background-color: #006666; /* Teal color */
         color: ; white /* Transparent background */
@@ -129,87 +128,62 @@
         transition: background-color 0.3s, color 0.3s; /* Smooth transition */
     }
 
-    .dashboard-link:hover {
-        background-color: #006666; /* Solid teal color on hover */
-        color: white; /* White text on hover */
-    }
+
+                h {
+            color: white; /* Teal */
+
+        }
     </style>
 </head>
 <body>
 
-
     <div class="container">
-        <h1 class = "dashboard-link">Conversion Ratio Dashboard</h1>
-
-        <div>
-        <h  class="dashboard-link2">Monthly</h>
-        <a href="yearly" class="dashboard-link">Yearly</a>
+        <h1 class = 'dashboard-link'>Conversion Ratio Dashboard</h1>
+              <div>
+        <a href="/" class="dashboard-link">Monthly</a>
+                  <a href="yearly" class="dashboard-link">Yearly</a>
         <a href="quarterly" class="dashboard-link">Quarterly</a>
-            <a href="yty" class="dashboard-link">Financial Years</a>
+                  <h  class="dashboard-link2">Financial Years</h>
     </div>
 
-        <form action="/" method="get">
-            <label for="month">Select Month:</label>
-            <select name="month" id="month">
-                {% for month in layout.months %}
-                    <option value="{{ month }}">{{ month }}</option>
+
+        <form action="/yty" method="get">
+            <label for="year">Select FY:</label>
+            <select name="year" id="year">
+                {% for year in layout.ytys %}
+                    <option value="{{ year }}">{{ year }}</option>
                 {% endfor %}
             </select>
-            <input type="submit" value="Filter Month">
+            <input type="submit" value="Filter FY">
         </form>
 
         <!-- Display the data table -->
         <div class="data-container">
             <div class="graph-container">
                 <table>
-                    {{ layout.df|safe }}
+                    {{ layout.yearly_summary_df1|safe }}
                 </table>
 
                 <div class="conversion-ratio">
                     <p>* Conversion Ratio = Order Value / Opportunity Value</p>
                 </div>
             </div>
-
         </div>
     </div>
 
 
 
-
-<!-- Display the pivot table -->
-<div class="data-container">
-    <div class="graph-container">
-        <h2>Conversion Rate Pivot Table</h2>
-
-        <!-- Add a form for year selection -->
-<form action="/" method="get">
-    <label for="year">Select Year:</label>
-    <select name="year" id="year">
-        {% for year in layout.years %}
-            <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}</option>
-        {% endfor %}
-    </select>
-    <input type="submit" value="Filter Year">
-</form>
-
-        <div class="table-responsive">
-            <table>
-                {{ layout.pivot_table|safe }}
-            </table>
-        </div>
-    </div>
-</div>
 
     <!-- Display the charts -->
     <div class="charts">
         <div class="graph-container">
-            <h2>Opportunity Amount Over Months</h2>
+            <h2>Opportunity Amount Over Years</h2>
             <div id="opportunity_chart"></div>
             {{ layout.opportunity_chart|safe }}
         </div>
 
         <div class="graph-container">
-            <h2>Order Value Over Months</h2>
+            <h2>Order Value Over Years</h2>
             <div id="order_value_chart"></div>
             {{ layout.order_value_chart|safe }}
         </div>
@@ -217,7 +191,7 @@
 
     <div class="charts2">
         <div class="graph-container">
-            <h2>Conversion Rate Over Months</h2>
+            <h2>Conversion Rate Over Years</h2>
             <div id="conversion_rate_chart"></div>
             {{ layout.conversion_rate_chart|safe }}
         </div>
