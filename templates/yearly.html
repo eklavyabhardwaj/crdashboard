@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conversion Ratio Dashboard</title>
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='ELEC.png') }}">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
         body {
@@ -57,6 +58,15 @@
 
         .charts {
             display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(2, 1fr);
+            margin-top: 30px;
+        }
+
+
+
+         .charts2 {
+
             gap: 20px;
             grid-template-columns: repeat(2, 1fr);
             margin-top: 30px;
@@ -116,7 +126,8 @@
         color: white; /* White text on hover */
     }
 
-                .dashboard-link2 {
+
+    .dashboard-link2 {
 
         background-color: #006666; /* Teal color */
         color: ; white /* Transparent background */
@@ -133,12 +144,23 @@
             color: white; /* Teal */
 
         }
+
+
+                .form-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px; /* Add margin to separate from other elements */
+        }
+
+        .form-container form {
+            margin-right: 10px; /* Add space between forms */
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1 class = "dashboard-link">Conversion Ratio Dashboard</h1>
+        <h1 class = 'dashboard-link'>Conversion Ratio Dashboard</h1>
               <div>
         <a href="/" class="dashboard-link">Monthly</a>
                   <h  class="dashboard-link2">Yearly</h>
@@ -174,13 +196,51 @@
     <!-- Display the pivot table -->
 <div class="data-container">
     <div class="graph-container">
-        <h2>Conversion Rate Pivot Table</h2>
 
 
-        <div class="table-responsive">
-            <table>
-                {{ layout.pivot_table|safe }}
-            </table>
+        <div class="form-container">
+            <!-- Form for year selection -->
+            <form action="/" method="get">
+                <label for="year">Select Year:</label>
+                <select name="year" id="year">
+                    {% for year in layout.years %}
+                    <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}</option>
+                    {% endfor %}
+                </select>
+                <input type="submit" value="Filter Year">
+            </form>
+
+            <!-- Form for pivot table selection -->
+            <form id="pivot-table-selection">
+                <label for="pivot-table">Select Pivot Table:</label>
+                <select name="pivot-table" id="pivot-table">
+                    <option value="conversion-rate">Conversion Rate Pivot Table</option>
+                    <option value="opportunity-amount">Opportunity Amount Pivot Table</option>
+                    <option value="sales-order">Sales Order Pivot Table</option>
+                </select>
+            </form>
+        </div>
+
+        <!-- Display the selected pivot table -->
+        <div id="pivot-table-container" class="data-container">
+            <div id="conversion-rate-table" class="graph-container">
+                <h2>Conversion Rate Pivot Table</h2>
+                <table>
+                    {{ layout.pivot_table|safe }}
+                </table>
+            </div>
+            <div id="opportunity-amount-table" class="graph-container" style="display: none;">
+                <h2>Opportunity Amount Pivot Table</h2>
+                <table>
+                    {{ layout.pivot_table1|safe }}
+                </table>
+            </div>
+            <div id="sales-order-table" class="graph-container" style="display: none;">
+                <h2>Sales Order Pivot Table</h2>
+                <table>
+                    {{ layout.pivot_table2|safe }}
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -221,6 +281,23 @@
 
 
     </script>
+
+
+<script>
+    // JavaScript to handle pivot table selection
+    document.getElementById('pivot-table-selection').addEventListener('change', function() {
+        var selectedTable = document.getElementById('pivot-table').value;
+        var tables = document.querySelectorAll('#pivot-table-container .graph-container');
+
+        tables.forEach(function(table) {
+            if (table.id === selectedTable + '-table') {
+                table.style.display = 'block';
+            } else {
+                table.style.display = 'none';
+            }
+        });
+    });
+</script>
 
 
 

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Files</title>
+</head>
+<body>
+    <h1>Upload Files</h1>
+    <form action="/admin_page" method="post" enctype="multipart/form-data">
+        <h2>Carryforward_balance_CR</h2>
+        <input type="file" name="Carryforward_balance_CR[]" multiple accept=".xlsx">
+        <br><br>
+        <h2>Carryforward_Export_balance_CR</h2>
+        <input type="file" name="Carryforward_Export_balance_CR[]" multiple accept=".xlsx">
+        <br><br>
+        <h2>monthly_created_opp_for_CR</h2>
+        <input type="file" name="monthly_created_opp_for_CR[]" multiple accept=".xlsx">
+        <br><br>
+        <h2>Monthly_created_opp_for_Export_CR</h2>
+        <input type="file" name="Monthly_created_opp_for_Export_CR[]" multiple accept=".xlsx">
+        <br><br>
+        <h2>Carryforward_Export_CR</h2>
+        <input type="file" name="Carryforward_Export_CR[]" multiple accept=".xlsx">
+        <br><br>
+        <h2>Carryforward_CR</h2>
+        <input type="file" name="Carryforward_CR[]" multiple accept=".xlsx">
+        <br><br>
+        <h2>Conversion_ratio</h2>
+        <input type="file" name="Conversion_ratio[]" multiple accept=".xlsx">
+        <br><br>
+        <input type="submit" value="Upload Files">
+        <br><br>
+    </form>
+</body>
+</html>

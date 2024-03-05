@@ -5,9 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conversion Ratio Dashboard</title>
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='ELEC.png') }}">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
-
         body {
             font-family: 'Arial', sans-serif;
             background-color: #f5f5f5; /* Light Gray */
@@ -63,6 +63,14 @@
             margin-top: 30px;
         }
 
+
+         .charts1 {
+
+            gap: 20px;
+            grid-template-columns: repeat(2, 1fr);
+            margin-top: 30px;
+        }
+
         .graph-container {
             padding: 20px;
             background-color: #fff; /* White */
@@ -73,11 +81,6 @@
         h2 {
             color: #006666; /* Teal */
             font-size: 18px;
-        }
-
-        h {
-            color: white; /* Teal */
-
         }
 
         .conversion-ratio {
@@ -102,141 +105,181 @@
         }
 
         .container {
-        /* Your existing container styles */
-        text-align: left; /* Center align the links */
-    }
+            text-align: left; /* Center align the links */
+        }
 
-    .dashboard-link {
-        background-color: transparent; /* Transparent background */
-        color: #006666; /* Teal color */
-        border: 1px solid #006666; /* Teal border */
-        padding: 10px 20px; /* Padding */
-        text-decoration: none; /* Remove underline */
-        margin-right: 10px; /* Add some spacing between the links */
-        border-radius: 5px; /* Rounded corners */
-        transition: background-color 0.3s, color 0.3s; /* Smooth transition */
-    }
+        .dashboard-link {
+            background-color: transparent; /* Transparent background */
+            color: #006666; /* Teal color */
+            border: 1px solid #006666; /* Teal border */
+            padding: 10px 20px; /* Padding */
+            text-decoration: none; /* Remove underline */
+            margin-right: 10px; /* Add some spacing between the links */
+            border-radius: 5px; /* Rounded corners */
+            transition: background-color 0.3s, color 0.3s; /* Smooth transition */
+        }
 
         .dashboard-link2 {
+            background-color: #006666; /* Teal color */
+            color: white; /* Transparent background */
+            border: 1px solid #006666; /* Teal border */
+            padding: 10px 20px; /* Padding */
+            text-decoration: none; /* Remove underline */
+            margin-right: 10px; /* Add some spacing between the links */
+            border-radius: 5px; /* Rounded corners */
+            transition: background-color 0.3s, color 0.3s; /* Smooth transition */
+        }
 
-        background-color: #006666; /* Teal color */
-        color: ; white /* Transparent background */
-        border: 1px solid #006666; /* Teal border */
-        padding: 10px 20px; /* Padding */
-        text-decoration: none; /* Remove underline */
-        margin-right: 10px; /* Add some spacing between the links */
-        border-radius: 5px; /* Rounded corners */
-        transition: background-color 0.3s, color 0.3s; /* Smooth transition */
-    }
+        .dashboard-link:hover {
+            background-color: #006666; /* Solid teal color on hover */
+            color: white; /* White text on hover */
+        }
 
-    .dashboard-link:hover {
-        background-color: #006666; /* Solid teal color on hover */
-        color: white; /* White text on hover */
-    }
+        .form-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px; /* Add margin to separate from other elements */
+        }
+
+        .form-container form {
+            margin-right: 10px; /* Add space between forms */
+        }
+
     </style>
 </head>
 <body>
 
+<div class="container">
+    <h1 class="dashboard-link">Conversion Ratio Dashboard</h1>
 
-    <div class="container">
-        <h1 class = "dashboard-link">Conversion Ratio Dashboard</h1>
-
-        <div>
-        <h  class="dashboard-link2">Monthly</h>
+    <div>
+        <h class="dashboard-link2">Monthly</h>
         <a href="yearly" class="dashboard-link">Yearly</a>
         <a href="quarterly" class="dashboard-link">Quarterly</a>
-            <a href="yty" class="dashboard-link">Financial Years</a>
+        <a href="yty" class="dashboard-link">Financial Years</a>
     </div>
 
-        <form action="/" method="get">
-            <label for="month">Select Month:</label>
-            <select name="month" id="month">
-                {% for month in layout.months %}
-                    <option value="{{ month }}">{{ month }}</option>
-                {% endfor %}
-            </select>
-            <input type="submit" value="Filter Month">
-        </form>
+    <form action="/" method="get">
+        <label for="month">Select Month:</label>
+        <select name="month" id="month">
+            {% for month in layout.months %}
+            <option value="{{ month }}">{{ month }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="Filter Month">
+    </form>
 
-        <!-- Display the data table -->
-        <div class="data-container">
-            <div class="graph-container">
-                <table>
-                    {{ layout.df|safe }}
-                </table>
-
-                <div class="conversion-ratio">
-                    <p>* Conversion Ratio = Order Value / Opportunity Value</p>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-
-
-
-<!-- Display the pivot table -->
-<div class="data-container">
-    <div class="graph-container">
-        <h2>Conversion Rate Pivot Table</h2>
-
-        <!-- Add a form for year selection -->
-<form action="/" method="get">
-    <label for="year">Select Year:</label>
-    <select name="year" id="year">
-        {% for year in layout.years %}
-            <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}</option>
-        {% endfor %}
-    </select>
-    <input type="submit" value="Filter Year">
-</form>
-
-        <div class="table-responsive">
+    <!-- Display the data table -->
+    <div class="data-container">
+        <div class="graph-container">
             <table>
-                {{ layout.pivot_table|safe }}
+                {{ layout.df|safe }}
             </table>
+
+            <div class="conversion-ratio">
+                <p>* Conversion Ratio = Order Value / Opportunity Value</p>
+            </div>
         </div>
     </div>
 </div>
 
-    <!-- Display the charts -->
-    <div class="charts">
-        <div class="graph-container">
-            <h2>Opportunity Amount Over Months</h2>
-            <div id="opportunity_chart"></div>
-            {{ layout.opportunity_chart|safe }}
+<!-- Display the pivot table -->
+<div class="data-container">
+    <div class="graph-container">
+
+
+        <div class="form-container">
+            <!-- Form for year selection -->
+            <form action="/" method="get">
+                <label for="year">Select Year:</label>
+                <select name="year" id="year">
+                    {% for year in layout.years %}
+                    <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}</option>
+                    {% endfor %}
+                </select>
+                <input type="submit" value="Filter Year">
+            </form>
+
+            <!-- Form for pivot table selection -->
+            <form id="pivot-table-selection">
+                <label for="pivot-table">Select Pivot Table:</label>
+                <select name="pivot-table" id="pivot-table">
+                    <option value="conversion-rate">Conversion Rate Pivot Table</option>
+                    <option value="opportunity-amount">Opportunity Amount Pivot Table</option>
+                    <option value="sales-order">Sales Order Pivot Table</option>
+                </select>
+            </form>
         </div>
 
-        <div class="graph-container">
-            <h2>Order Value Over Months</h2>
-            <div id="order_value_chart"></div>
-            {{ layout.order_value_chart|safe }}
+        <!-- Display the selected pivot table -->
+        <div id="pivot-table-container" class="data-container">
+            <div id="conversion-rate-table" class="graph-container">
+                <h2>Conversion Rate Pivot Table</h2>
+                <table>
+                    {{ layout.pivot_table|safe }}
+                </table>
+            </div>
+            <div id="opportunity-amount-table" class="graph-container" style="display: none;">
+                <h2>Opportunity Amount Pivot Table</h2>
+                <table>
+                    {{ layout.pivot_table1|safe }}
+                </table>
+            </div>
+            <div id="sales-order-table" class="graph-container" style="display: none;">
+                <h2>Sales Order Pivot Table</h2>
+                <table>
+                    {{ layout.pivot_table2|safe }}
+                </table>
+            </div>
         </div>
     </div>
+</div>
 
-    <div class="charts2">
-        <div class="graph-container">
-            <h2>Conversion Rate Over Months</h2>
-            <div id="conversion_rate_chart"></div>
-            {{ layout.conversion_rate_chart|safe }}
-        </div>
-
+<!-- Display the charts -->
+<div class="charts">
+    <div class="graph-container">
+        <h2>Opportunity Amount Over Months</h2>
+        <div id="opportunity_chart"></div>
+        {{ layout.opportunity_chart|safe }}
     </div>
 
+    <div class="graph-container">
+        <h2>Order Value Over Months</h2>
+        <div id="order_value_chart"></div>
+        {{ layout.order_value_chart|safe }}
+    </div>
+</div>
+</div>
+<div class="charts1">
+    <div class="graph-container">
+        <h2>Conversion Rate Over Months</h2>
+        <div id="conversion_rate_chart"></div>
+        {{ layout.conversion_rate_chart|safe }}
+    </div>
+</div>
 
+<script>
+    // Plotly plots need to be initialized separately using JavaScript
+    Plotly.newPlot('conversion_rate_chart', {{ layout.conversion_rate_chart }}, {});
+    Plotly.newPlot('order_value_chart', {{ layout.order_value_chart }}, {});
+    Plotly.newPlot('opportunity_chart', {{ layout.opportunity_chart }}, {});
+</script>
 
-    <script>
-        // Plotly plots need to be initialized separately using JavaScript
-        Plotly.newPlot('conversion_rate_chart', {{ layout.conversion_rate_chart }}, {});
-        Plotly.newPlot('order_value_chart', {{ layout.order_value_chart }}, {});
-        Plotly.newPlot('opportunity_chart', {{ layout.opportunity_chart }}, {});
+<script>
+    // JavaScript to handle pivot table selection
+    document.getElementById('pivot-table-selection').addEventListener('change', function() {
+        var selectedTable = document.getElementById('pivot-table').value;
+        var tables = document.querySelectorAll('#pivot-table-container .graph-container');
 
-
-
-    </script>
-
-
+        tables.forEach(function(table) {
+            if (table.id === selectedTable + '-table') {
+                table.style.display = 'block';
+            } else {
+                table.style.display = 'none';
+            }
+        });
+    });
+</script>
 
 </body>
 </html>
