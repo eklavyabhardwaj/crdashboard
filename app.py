@@ -1,9 +1,11 @@
-from flask import Flask, render_template, request
 import plotly.express as px
 import plotly.graph_objects as go
-import pandas as pd
-import sqlite3
 import calendar
+import sqlite3
+from flask import  render_template, request
+import pandas as pd
+from flask import Flask, send_from_directory
+
 
 app = Flask(__name__)
 
@@ -22,6 +24,11 @@ def fetch_data():
     except sqlite3.Error as e:
         print("SQLite error:", e)
         return None
+
+
+@app.route('/ELEC.png')
+def favicon():
+    return send_from_directory('static', 'ELEC.png', mimetype='image/x-icon')
 
 
 # Define a function to format the numbers
@@ -55,9 +62,6 @@ def index():
 
 
     df['Date and Time'] = pd.to_datetime(df['Month'], format = '%B %Y')
-
-
-
 
 
 
@@ -113,11 +117,88 @@ def index():
             # If the month is missing, insert a new column with NaN values
             pivot_df[month] = None
 
+
+    ##### Pivot Table for Conversion Rate
     # Sort the columns of the pivot table based on the sorted month list
     pivot_df = pivot_df.reindex(sorted(sorted_months, key=lambda x: pd.to_datetime(x, format='%B %Y')), axis=1)
 
 
+    ##### Pivot table for opportunity value
 
+
+    # Create the pivot table from the filtered y_mdf
+    pivot_df1 = y_mdf.pivot_table(index='Name', columns='Month', values='Opportunity Amount (INR Cr)', aggfunc='first')
+
+    # If you want to remove the names of the index and columns for display purposes, you can do:
+    pivot_df1.index.name = None
+    pivot_df1.columns.name = None
+
+    # Assuming 'Name' is the value in the index that you want to drop
+    if 'Name' in pivot_df1.index:
+        pivot_df1 = pivot_df1.drop('Name')
+
+    # Get the list of all months in "January 2024" format for the selected year
+    all_months = [f"{calendar.month_name[month]} {selected_year}" for month in range(1, 13)]
+
+    # Convert the month names to datetime objects for sorting
+    sorted_months = sorted(all_months, key=lambda x: pd.to_datetime(x, format='%B %Y'))
+
+    # Iterate over all months and check if each month exists in the pivot table
+    for month in sorted_months:
+        if month not in pivot_df1.columns:
+            # If the month is missing, insert a new column with NaN values
+            pivot_df1[month] = None
+
+    # Sort the columns of the pivot table based on the sorted month list
+    pivot_df1 = pivot_df1.reindex(sorted(sorted_months, key=lambda x: pd.to_datetime(x, format='%B %Y')), axis=1)
+
+
+    ### pivot table for sales order
+
+    # Create the pivot table from the filtered y_mdf
+    pivot_df2 = y_mdf.pivot_table(index='Name', columns='Month', values='Order Value (INR Cr)', aggfunc='first')
+
+    # If you want to remove the names of the index and columns for display purposes, you can do:
+    pivot_df2.index.name = None
+    pivot_df2.columns.name = None
+
+    # Assuming 'Name' is the value in the index that you want to drop
+    if 'Name' in pivot_df2.index:
+        pivot_df1 = pivot_df2.drop('Name')
+
+    # Get the list of all months in "January 2024" format for the selected year
+    all_months = [f"{calendar.month_name[month]} {selected_year}" for month in range(1, 13)]
+
+    # Convert the month names to datetime objects for sorting
+    sorted_months = sorted(all_months, key=lambda x: pd.to_datetime(x, format='%B %Y'))
+
+    # Iterate over all months and check if each month exists in the pivot table
+    for month in sorted_months:
+        if month not in pivot_df2.columns:
+            # If the month is missing, insert a new column with NaN values
+            pivot_df2[month] = None
+
+    # Sort the columns of the pivot table based on the sorted month list
+    pivot_df2 = pivot_df2.reindex(sorted(sorted_months, key=lambda x: pd.to_datetime(x, format='%B %Y')), axis=1)
+
+
+    pivot_df1.fillna('N/A', inplace=True)
+    pivot_df.fillna('N/A', inplace=True)
+    pivot_df2.fillna('N/A', inplace=True)
+
+
+
+    ### rest codes
+
+    e_df = e_df.sort_values(by = 'Name')
+
+    # Convert 'Month' column to datetime if it's not already in datetime format
+    e_df['Month'] = pd.to_datetime(e_df['Month'])
+
+    # Sort the DataFrame by 'Month' column in descending order (from latest to oldest)
+    e_df = e_df.sort_values(by='Month', ascending=False)
+
+    e_df['Month'] = e_df['Month'].dt.strftime('%B %Y')
 
     e_df = e_df[['Month', 'Name', 'Opportunity Amount (INR Cr)', 'Order Value (INR Cr)', 'Conversion Rate']]
 
@@ -179,6 +260,8 @@ def index():
         'opportunity_chart': opportunity_chart.to_html(full_html=False),
         'combined_chart': combined_chart.to_html(full_html=False),
         'pivot_table':pivot_df.to_html(classes='pivot-table', index=True),
+        'pivot_table1':pivot_df1.to_html(classes='pivot-table1',index = True),
+        'pivot_table2':pivot_df2.to_html(classes= 'pivot-table2',index = True),
         'years': unique_years,
         'df': e_df.to_html(index=False),
         'months': df['Month'].unique()
@@ -207,6 +290,8 @@ def quarterly():
 
 
     df['Date and Time'] = pd.to_datetime(df['Month'], format='%B %Y')
+
+
 
     df['Quarter'] = df['Date and Time'].dt.to_period('Q').dt.asfreq('Q-APR')
 
@@ -237,12 +322,6 @@ def quarterly():
     quarter_df['Conversion Rate'] = quarter_df['Conversion Rate'].apply(percent_conversion)
     # Convert 'Quarter' column to string
     # Pass only the first 5 rows of the DataFrame to the template
-
-
-
-
-
-   
 
 
     # Find the latest quarter
@@ -347,7 +426,12 @@ def yearly():
 
     yearly_summary_df['Conversion Rate'] = yearly_summary_df['Conversion Rate'].apply(percent_conversion)
 
-    # y_mdf = df.copy()
+
+    df['Opportunity Amount (INR Cr)'] = df['Opportunity Amount (INR Cr)'].apply(format_inr)
+
+    df['Order Value (INR Cr)'] = df['Order Value (INR Cr)'].apply(format_inr)
+
+    y_mdf = df.copy()
 
     # Filter by selected year
     unique_years = sorted(df['Year'].unique(), reverse=True)
@@ -382,6 +466,66 @@ def yearly():
 
     # Sort the columns of the pivot table based on the sorted month list
     pivot_df = pivot_df.reindex(sorted(sorted_months, key=lambda x: pd.to_datetime(x, format='%B %Y')), axis=1)
+
+    ##### Pivot table for opportunity value
+
+    # Create the pivot table from the filtered y_mdf
+    pivot_df1 = y_mdf.pivot_table(index='Name', columns='Month', values='Opportunity Amount (INR Cr)', aggfunc='first')
+
+    # If you want to remove the names of the index and columns for display purposes, you can do:
+    pivot_df1.index.name = None
+    pivot_df1.columns.name = None
+
+    # Assuming 'Name' is the value in the index that you want to drop
+    if 'Name' in pivot_df1.index:
+        pivot_df1 = pivot_df1.drop('Name')
+
+    # Get the list of all months in "January 2024" format for the selected year
+    all_months = [f"{calendar.month_name[month]} {selected_year}" for month in range(1, 13)]
+
+    # Convert the month names to datetime objects for sorting
+    sorted_months = sorted(all_months, key=lambda x: pd.to_datetime(x, format='%B %Y'))
+
+    # Iterate over all months and check if each month exists in the pivot table
+    for month in sorted_months:
+        if month not in pivot_df1.columns:
+            # If the month is missing, insert a new column with NaN values
+            pivot_df1[month] = None
+
+    # Sort the columns of the pivot table based on the sorted month list
+    pivot_df1 = pivot_df1.reindex(sorted(sorted_months, key=lambda x: pd.to_datetime(x, format='%B %Y')), axis=1)
+
+    ### pivot table for sales order
+
+    # Create the pivot table from the filtered y_mdf
+    pivot_df2 = y_mdf.pivot_table(index='Name', columns='Month', values='Order Value (INR Cr)', aggfunc='first')
+
+    # If you want to remove the names of the index and columns for display purposes, you can do:
+    pivot_df2.index.name = None
+    pivot_df2.columns.name = None
+
+    # Assuming 'Name' is the value in the index that you want to drop
+    if 'Name' in pivot_df2.index:
+        pivot_df1 = pivot_df2.drop('Name')
+
+    # Get the list of all months in "January 2024" format for the selected year
+    all_months = [f"{calendar.month_name[month]} {selected_year}" for month in range(1, 13)]
+
+    # Convert the month names to datetime objects for sorting
+    sorted_months = sorted(all_months, key=lambda x: pd.to_datetime(x, format='%B %Y'))
+
+    # Iterate over all months and check if each month exists in the pivot table
+    for month in sorted_months:
+        if month not in pivot_df2.columns:
+            # If the month is missing, insert a new column with NaN values
+            pivot_df2[month] = None
+
+    # Sort the columns of the pivot table based on the sorted month list
+    pivot_df2 = pivot_df2.reindex(sorted(sorted_months, key=lambda x: pd.to_datetime(x, format='%B %Y')), axis=1)
+
+    pivot_df1.fillna('N/A', inplace=True)
+    pivot_df.fillna('N/A', inplace=True)
+    pivot_df2.fillna('N/A', inplace=True)
 
     #ye_df = yearly_summary_df.copy()
 
@@ -447,6 +591,8 @@ def yearly():
         'opportunity_chart': opportunity_chart.to_html(full_html=False),
         'combined_chart': combined_chart.to_html(full_html=False),
         'pivot_table': pivot_df.to_html(classes='pivot-table', index=True),
+        'pivot_table1': pivot_df1.to_html(classes='pivot-table1', index=True),
+        'pivot_table2': pivot_df2.to_html(classes='pivot-table2', index=True),
         'yearly_summary_df': ye_df.to_html(index=False),
         'years': yearly_summary_df['Year'].unique()
         # Pass unique months for the dropdown menu
@@ -556,10 +702,18 @@ def yty():
 
     }
 
+
+
     return render_template('yty.html',layout=layout)
 
 
-#@app.route('/update_database',methods = ['GET','POST','PUSH'])
+
+
+
+
+
+
+
 
 
 
